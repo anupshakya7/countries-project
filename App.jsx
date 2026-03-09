@@ -1,12 +1,14 @@
 import { Outlet } from 'react-router-dom'
 import Header from './components/Header'
+import { useState } from 'react';
+import { ThemeProvider } from './contexts/ThemeContext';
 
 const App = () => {
   return (
-    <>
-    <Header/>
-    <Outlet />
-    </>
+      <ThemeProvider>
+        <Header />
+        <Outlet />
+      </ThemeProvider>
   )
 }
 

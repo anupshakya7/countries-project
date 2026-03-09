@@ -1,61 +1,79 @@
 import React, { useEffect, useState } from 'react'
 import './CountryDetail.css'
-import { Link, useParams } from 'react-router-dom';
+import { Link, useLocation, useParams } from 'react-router-dom';
+import { useWindowSize } from '../hooks/useWindowSize';
+import { useTheme } from '../hooks/useTheme';
 
 const CountryDetail = () => {
   // const countryName = new URLSearchParams(location.search).get('name');
   const params = useParams();
+  const { state } = useLocation();
+  // const [isDark] = useOutletContext();
+  // const [isDark] = useContext(ThemeContext);
+  const[isDark] = useTheme();
+
   const countryName = params.country;
 
   const [countryData, setCountryData] = useState(null);
   const [notFound, setNotFound] = useState(false);
+  const windowSize = useWindowSize();
 
-  console.log(countryData?.borders);
+  function updateCountriesList(data) {
+    setCountryData({
+      flag: data.flags.svg,
+      name: data.name.common,
+      nativeName: Object.values(data.name.nativeName)[0].common,
+      population: data.population,
+      region: data.region,
+      subregion: data.subregion,
+      capital: data.capital,
+      tld: data.tld,
+      languages: Object.values(data.languages).join(', '),
+      currency: Object.values(data.currencies).map((currency) => currency.name).join(', '),
+      borders: []
+    })
 
-  useEffect(() => {
-    fetch(`https://restcountries.com/v3.1/name/${countryName}?fullText=true`)
-      .then(res => res.json())
-      .then(([data]) => {
-        setCountryData({
-          flag: data.flags.svg,
-          name: data.name.common,
-          nativeName: Object.values(data.name.nativeName)[0].common,
-          population: data.population,
-          region: data.region,
-          subregion: data.subregion,
-          capital: data.capital,
-          tld: data.tld,
-          languages: Object.values(data.languages).join(', '),
-          currency: Object.values(data.currencies).map((currency) => currency.name).join(', '),
-          borders: [] 
-        })
+    if (!data.borders) {
+      data.borders = [];
+    }
+    Promise.all(data.borders.map((border) => {
+      return fetch(`https://restcountries.com/v3.1/alpha/${border}`)
+        .then((res) => res.json())
+        .then(([borderCountry]) => borderCountry.name.common)
+    })).then((borders) => {
+      setCountryData((prevState) => ({ ...prevState, borders }))
+    });
+}
 
-        if(!data.borders){
-            data.borders = [];
-        }
-        Promise.all(data.borders.map((border) => {
-          return fetch(`https://restcountries.com/v3.1/alpha/${border}`)
-            .then((res) => res.json())
-            .then(([borderCountry]) => borderCountry.name.common)
-        })).then((borders) => {
-          setCountryData((prevState) => ({...prevState, borders}))
-        });
+useEffect(() => {
+  if(state){
+      updateCountriesList(state.data);
+      return;
+  }
+
+  fetch(`https://restcountries.com/v3.1/name/${countryName}?fullText=true`)
+    .then(res => res.json())
+    .then(([data]) => {
+        updateCountriesList(data);
       })
-      .catch((err) => {
+      .catch ((err) => {
         console.log(err);
         setNotFound(true);
       });
-  },[countryName]);
-  
-  if(notFound){
-    return <h2>Country Not Found</h2>
-  }
+}, [countryName]);
 
-  return (
-    countryData === null ? 'loading...' :
-     <main>
+if (notFound) {
+  return <h2>Country Not Found</h2>
+}
+
+return (
+  countryData === null ? 'loading...' :
+    <main className={isDark ? 'dark':''}>
+      {/* <h1 style={{ textAlign: "center"}}>
+        {windowSize.width} X {windowSize.height}
+      </h1> */}
       <div className="country-details-container">
-        <span className="back-button" onClick={() => history.back() }>
+        <span className="back-button" onClick={() => history.back()}>
           <i className="fa-solid fa-arrow-left"></i>&nbsp; Back
         </span>
         <div className="country-details">
@@ -69,7 +87,7 @@ const CountryDetail = () => {
               </p>
               <p>
                 <b>
-                  Population: 
+                  Population:
                 </b>
                 <span className="population">{countryData.population.toLocaleString('en-In')}</span>
               </p>
@@ -98,7 +116,7 @@ const CountryDetail = () => {
                 <span className="languages">{countryData.languages}</span>
               </p>
             </div>
-            { countryData.borders.length !== 0 && <div className="border-countries">
+            {countryData.borders.length !== 0 && <div className="border-countries">
               <b>Border Countries: </b>&nbsp;
               {
                 countryData.borders.map((border) => <Link key={border} to={`/country-detail/${border}`}>{border}</Link>)
@@ -108,7 +126,7 @@ const CountryDetail = () => {
         </div>
       </div>
     </main>
-  )
+)
 }
 
 export default CountryDetail

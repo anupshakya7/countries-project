@@ -1,10 +1,9 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useOutletContext } from 'react-router-dom'
 
-const CountryCard = ({name, flag, population, region, capital}) => {
-
+const CountryCard = ({name, flag, population, region, capital, data}) => {
     return (
-        <Link to={`/country-detail/${name}`} className="country-card" >
+        <Link to={`/country-detail/${name}`} className="country-card" state={{data}}>
             <img src={flag} alt={name+' Flag'}/>
             <div className="card-text">
                 <h3 className="card-title">{name}</h3>
