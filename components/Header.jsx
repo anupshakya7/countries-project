@@ -15,7 +15,7 @@ const Header = () => {
         <header className={`header-container ${isDark ? 'dark':''}`}>
             <div className="header-content">
                 <h2 className="title">
-                    <Link to="/">Where in the worlds?</Link>
+                    <Link to="/">Where in the world?</Link>
                 </h2>
                 <p className="theme-changer" onClick={() => {
                     setIsDark(!isDark);
