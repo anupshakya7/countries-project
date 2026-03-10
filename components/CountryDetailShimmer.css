@@ -1,19 +1,27 @@
+main .shimmer{
+    --shimmer-color: hsl(0, 0%, 78%);
+}
+
+main.dark .shimmer{
+    --shimmer-color: hsl(208, 21%, 34%);
+}
+
 .shimmer .flag {
   width: 40%;
   height: 240px;
-  background-color: var(--elements-color);
+  background-color: var(--shimmer-color);
   border-radius: 4px;
 }
 
 .shimmer .title {
   height: 36px;
-  background-color: var(--elements-color);
+  background-color: var(--shimmer-color);
   border-radius: 4px;
 }
 
 .country-details.shimmer p {
   height: 22px;
-  background-color: var(--elements-color);
+  background-color: var(--shimmer-color);
   border-radius: 2px;
 }
 
