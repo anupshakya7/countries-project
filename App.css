@@ -59,8 +59,9 @@ a {
 .countries-container {
     max-width: 1200px;
     margin-top: 16px;
-    display: flex;
-    gap: 64px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 32px;
     flex-wrap: wrap;
     margin-inline: auto;
     justify-content: space-between;
@@ -82,9 +83,23 @@ a {
     box-shadow: 0 0 16px 0px rgba(0, 0, 0, 0.2);
 }
 
+.back-button{
+    background: #f0f8ff4d;
+}
+
 .card-title {
     font-size: 24px;
     margin-block: 16px;
+}
+
+.flag-container{
+    height: 160px;
+    overflow: hidden;
+}
+
+.flag-container img{
+    height: 100%;
+    object-fit: cover;
 }
 
 .card-text {
@@ -99,6 +114,9 @@ a {
     width: 100%;
 }
 
+.border-countries a{
+    background: #f0f8ff4d;
+}
 
 .search-filter-container {
     max-width: 1200px;

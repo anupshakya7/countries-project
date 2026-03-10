@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react'
-import './CountryDetail.css'
+import './CountryDetailStyle.css'
 import { Link, useLocation, useParams } from 'react-router-dom';
 import { useWindowSize } from '../hooks/useWindowSize';
 import { useTheme } from '../hooks/useTheme';
+import CountryDetailShimmer from './CountryDetailShimmer';
 
 const CountryDetail = () => {
   // const countryName = new URLSearchParams(location.search).get('name');
@@ -21,15 +22,15 @@ const CountryDetail = () => {
   function updateCountriesList(data) {
     setCountryData({
       flag: data.flags.svg,
-      name: data.name.common,
-      nativeName: Object.values(data.name.nativeName)[0].common,
+      name: data.name.common || data.name,
+      nativeName: Object.values(data.name.nativeName || {})[0]?.common,
       population: data.population,
       region: data.region,
       subregion: data.subregion,
       capital: data.capital,
       tld: data.tld,
-      languages: Object.values(data.languages).join(', '),
-      currency: Object.values(data.currencies).map((currency) => currency.name).join(', '),
+      languages: Object.values(data.languages || {}).join(', '),
+      currency: Object.values(data.currencies || {}).map((currency) => currency.name).join(', '),
       borders: []
     })
 
@@ -47,14 +48,18 @@ const CountryDetail = () => {
 
 useEffect(() => {
   if(state){
+    setTimeout(() => {
       updateCountriesList(state.data);
-      return;
+    }, 1000);
+    return;
   }
 
   fetch(`https://restcountries.com/v3.1/name/${countryName}?fullText=true`)
     .then(res => res.json())
     .then(([data]) => {
-        updateCountriesList(data);
+        setTimeout(() => {
+          updateCountriesList(data);
+        },1000);
       })
       .catch ((err) => {
         console.log(err);
@@ -67,12 +72,9 @@ if (notFound) {
 }
 
 return (
-  countryData === null ? 'loading...' :
-    <main className={isDark ? 'dark':''}>
-      {/* <h1 style={{ textAlign: "center"}}>
-        {windowSize.width} X {windowSize.height}
-      </h1> */}
-      <div className="country-details-container">
+  <main className={isDark ? 'dark':''}>
+  {countryData === null ? (<CountryDetailShimmer/>) :
+      (<div className="country-details-container">
         <span className="back-button" onClick={() => history.back()}>
           <i className="fa-solid fa-arrow-left"></i>&nbsp; Back
         </span>
@@ -101,7 +103,7 @@ return (
               </p>
               <p>
                 <b>Capital:</b>
-                <span className="capital">{countryData.capital.join(', ')}</span>
+                <span className="capital">{countryData.capital?.join(', ')}</span>
               </p>
               <p>
                 <b>Top Level Domain: </b>
@@ -124,7 +126,7 @@ return (
             </div>}
           </div>
         </div>
-      </div>
+      </div>)}
     </main>
 )
 }
